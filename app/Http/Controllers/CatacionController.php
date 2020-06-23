@@ -41,7 +41,7 @@ class CatacionController extends Controller {
 		if ($_POST) {
 
 			$fecha = $request['fecha'];
-			$fecha = date_format(date_create(date($fecha)), 'd-m-Y H:i:s');
+			$fecha = date_format(date_create(date($fecha)), 'Ymd h:i:s');
 			$descripcion = $request['descripcion'];
 			$lugar = $request['lugar'];
 			$identificador_muestra = $request['identificador_muestra'];
@@ -51,13 +51,14 @@ class CatacionController extends Controller {
 			$codigo = $this->funciones->generar_codigo('sesioncataciones', 8);
 			$cabecera = new Sesioncatacion;
 			$cabecera->id = $id;
-			$cabecera->fecha = $fecha;
+			$cabecera->fecha = date("Ymd h:i:s");
+			$cabecera->fechasesion = date('Ymd');
 			$cabecera->codigo = $codigo;
 			$cabecera->descripcion = $descripcion;
 			$cabecera->lugar = $lugar;
 			$cabecera->identificador_muestra = $identificador_muestra;
 			$cabecera->numeros_muestra = $numeros_muestra;
-			$cabecera->fecha_crea = $this->fechaactual;
+			$cabecera->fecha_crea = date("Ymd h:i:s");
 			$cabecera->usuario_crea = Session::get('usuario')->usuario_solomon_id;
 			$cabecera->save();
 
@@ -155,7 +156,7 @@ class CatacionController extends Controller {
 		if ($_POST) {
 
 			$fecha = $request['fecha'];
-			$fecha = date_format(date_create(date($fecha)), 'd-m-Y H:i:s');
+			$fecha = date_format(date_create(date($fecha)), 'Ymd h:i:s');
 			$descripcion = $request['descripcion'];
 			$lugar = $request['lugar'];
 			$identificador_muestra = $request['identificador_muestra'];

@@ -27,9 +27,10 @@ class Controller extends BaseController {
 		$fecha->modify('first day of this month');
 		$this->inicio = date_format(date_create($fecha->format('Y-m-d')), 'd-m-Y');
 		$this->fin = date_format(date_create(date('Y-m-d')), 'd-m-Y');
+
 		$this->prefijomaestro = $this->funciones->prefijomaestra();
-		$this->fechaactual = date('d-m-Y H:i:s');
-		$this->hoy = date_format(date_create(date('Y-m-d H:i:s')), 'd-m-Y H:i:s');
+		$this->fechaactual = date('Ymd h:i:s');
+		$this->hoy = date_format(date_create(date('Ymd h:i:s')), 'Ymd h:i:s');
 	}
 
 }
