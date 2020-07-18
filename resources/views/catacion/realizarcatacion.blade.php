@@ -30,7 +30,11 @@
                         data_alias='{{$item->alias}}'
                         data_opcion='{{$idopcion}}'
                         data_muestra='{{$item->id}}'>
-                      <a href="#{{$item->alias}}" data-toggle="tab">{{$item->alias}}</a>
+                      <a href="#{{$item->alias}}" data-toggle="tab">
+                        {{$item->alias}}<br>
+                        <strong>{{$item->codigo}}</strong>
+
+                      </a>
                     </li>
                   @endforeach
                 </ul>
@@ -77,6 +81,8 @@
   <script src="{{ asset('public/js/app-form-elements.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/parsley/parsley.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/slider-barras/js/slider.js') }}" type="text/javascript"></script>
+
+    <script src="{{ asset('public/js/general/navAccordion.js?v='.$version) }}" type="text/javascript"></script>
 
 
 

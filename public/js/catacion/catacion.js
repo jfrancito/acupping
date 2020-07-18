@@ -2,13 +2,136 @@ $(document).ready(function(){
 
 	var carpeta = $("#carpeta").val();
 
+    $(".catacion").on('change','#especie_id', function() {
+        var _token                      = $('#token').val();
+        var especie_id                  = $(this).val();
+        $('.ajax_varietales').html('');
+
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+"/ajax-combo-varietales-especie",
+            data    :   {
+                            _token                          : _token,
+                            especie_id                      : especie_id
+                        },
+            success: function (data) {
+                $('.ajax_varietales').html(data);
+                cerrarcargando();
+            },
+            error: function (data) {
+                error500(data);
+            }
+        });
+    });
+
+    $(".catacion").on('click','.btn_eliminar_descriptor', function() {
+
+        var _token                      = $('#token').val();
+        var padre                       = $(this).parents('.etiqueta-descriptores');
+        var data_catacion_descriptor_id = $(padre).attr('data_catacion_descriptor_id');
+        var padre_seccion               = $(this).parents('.padre_seccion');
+        var tipocatacion_codigo         = $(padre_seccion).attr('data_codigo');
+        var data_muestra_id             = $(padre_seccion).attr('data_muestra_id');
 
 
-    $(".catacion").on('click','.selectdescriptores', function() {
-        var padre                       = $(this).parents('.panel-indicadores');
-        var hermano                     = $(padre).siblings('.panel-descriptores');
+        $('.ajax_lista_descriptores_'+tipocatacion_codigo).html('');
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+"/ajax-eliminar-descriptores-catacion",
+            data    :   {
+                            _token                          : _token,
+                            data_catacion_descriptor_id     : data_catacion_descriptor_id,
+                            tipocatacion_codigo             : tipocatacion_codigo,
+                            muestra_id                      : data_muestra_id,
+                        },
+            success: function (data) {
+
+                $('.ajax_lista_descriptores_'+tipocatacion_codigo).html(data);
+                alertajax("Eliminación exitosa");
+                cerrarcargando();
+
+            },
+            error: function (data) {
+                error500(data);
+            }
+        });
+
+
+    });
+
+    $(".catacion").on('click','.cerra-panel', function() {
+
+        var padre                       = $(this).parents('.panel-descriptores');
+        var hermano                     = $(padre).siblings('.panel-indicadores');
         $(padre).toggle();
         $(hermano).toggle();
+
+    });
+
+
+
+    $(".catacion").on('click','.accordion-btn-wrap-agregar', function() {
+        var _token                      = $('#token').val();
+        var padre                       = $(this).parents('.descriptor');
+        var descriptortipocatacion_id   = $(padre).attr('data_descriptortipocatacion_id');
+        var data_catacion_id            = $(padre).attr('data_catacion_id');
+        var tipocatacion_codigo         = $(padre).attr('data_tipocatacion_codigo');
+
+        $('.ajax_lista_descriptores_'+tipocatacion_codigo).html('');
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+"/ajax-lista-descriptores-catacion",
+            data    :   {
+                            _token                          : _token,
+                            descriptortipocatacion_id       : descriptortipocatacion_id,
+                            data_catacion_id                : data_catacion_id,
+                            tipocatacion_codigo             : tipocatacion_codigo,
+                        },
+            success: function (data) {
+                $('.ajax_lista_descriptores_'+tipocatacion_codigo).html(data);
+                alertajax("Inserción exitosa");
+                cerrarcargando();
+            },
+            error: function (data) {
+                error500(data);
+            }
+        });
+
+    });
+
+    $(".catacion").on('click','.selectdescriptores', function() {
+        var _token                      = $('#token').val();
+        var padre                       = $(this).parents('.panel-indicadores');
+        var hermano                     = $(padre).siblings('.panel-descriptores');
+        var padre_seccion               = $(this).parents('.padre_seccion');
+        var data_codigo                 = $(padre_seccion).attr('data_codigo');
+        var data_muestra_id             = $(padre_seccion).attr('data_muestra_id');
+
+
+        $(padre).toggle();
+        $(hermano).toggle();
+
+        $('.ajax-descriptores').html('');
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+"/ajax-lista-descriptores",
+            data    :   {
+                            _token                  : _token,
+                            tipocatacion_codigo     : data_codigo,
+                            muestra_id              : data_muestra_id,
+                        },
+            success: function (data) {
+                $('.ajax-descriptores').html(data);
+                cerrarcargando();
+            },
+            error: function (data) {
+                error500(data);
+            }
+        });
     });
 
 
@@ -100,7 +223,7 @@ $(document).ready(function(){
         abrircargando();
         $.ajax({
             type    :   "POST",
-            url     :   carpeta+"/ajax-mostrar-form-muestra",
+            url     :   carpeta+"/ajax-mostrar-form-catacion",
             data    :   {
                             _token                  : _token,
                             muestra_id              : muestra_id,

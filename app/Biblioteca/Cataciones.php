@@ -1,10 +1,24 @@
 <?php
 namespace App\Biblioteca;
 use App\Catacion;
+use App\Descriptortipocatacion;
 use App\Muestra;
 use App\Tipocatacion;
 
 class Cataciones {
+
+	public function lista_descriptores_niveles($nivel, $tipocatacion_id, $padre) {
+
+		$listadescriptortipocatacion = Descriptortipocatacion::join('descriptores as de', 'de.id', '=', 'descriptortipocataciones.descriptor_id')
+		//->where('de.nivel', '=', $nivel)
+			->where('de.padre', '=', $padre)
+			->where('descriptortipocataciones.tipocatacion_id', '=', $tipocatacion_id)
+			->select('de.*', 'descriptortipocataciones.id as descriptortipocatacion_id')
+			->get();
+
+		return $listadescriptortipocatacion;
+
+	}
 
 	public function nota_catacion($codigo, $muestra_id) {
 

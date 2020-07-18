@@ -16,4 +16,8 @@ class Tipomuestra extends Model {
 		return $this->hasMany('App\Muestra');
 	}
 
+	public function codigotipomuestras() {
+		return $this->hasMany('App\Codigotipomuetra');
+	}
+
 }

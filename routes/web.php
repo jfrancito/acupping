@@ -54,7 +54,12 @@ Route::group(['middleware' => ['authaw']], function () {
 
 	Route::any('/ajax-recalcular-puntaje-catacion-muestra', 'CatacionController@actionAjaxRecalcularPuntajeCatacionMuestra');
 	Route::any('/ajax-notas-catacion-muestra', 'CatacionController@actionAjaxNotasCatacionMuestra');
-	Route::any('/ajax-mostrar-form-muestra', 'CatacionController@actionAjaxMostrarFormCatacion');
+	Route::any('/ajax-mostrar-form-catacion', 'CatacionController@actionAjaxMostrarFormCatacion');
 	Route::any('/ajax-tueste', 'CatacionController@actionAjaxTueste');
+
+	Route::any('/ajax-lista-descriptores', 'CatacionController@actionAjaxListaDescriptores');
+	Route::any('/ajax-lista-descriptores-catacion', 'CatacionController@actionAjaxListaDescriptoresCatacion');
+	Route::any('/ajax-eliminar-descriptores-catacion', 'CatacionController@actionAjaxEliminarDescriptoresCatacion');
+	Route::any('/ajax-combo-varietales-especie', 'CatacionController@actionAjaxComboVarietalesEspecie');
 
 });

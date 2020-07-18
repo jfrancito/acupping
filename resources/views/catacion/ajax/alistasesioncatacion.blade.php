@@ -1,7 +1,7 @@
 <table id="table1" class="table table-striped table-hover table-fw-widget dt-responsive nowrap listatabla" style='width: 100%;'>
   <thead>
     <tr>
-      <th>Codigo</th>
+      <th>Sesión catación</th>
       <th>Dueño</th>
       <th>Fecha y hora</th>
       <th>Descripción</th>
@@ -22,7 +22,7 @@
         <td>{{$funcion->funciones->tabla_usuario($item->usuario_crea)->nombre}}</td>
         <td>{{date_format(date_create($item->fecha_crea), 'd-m-Y H:i')}}</td>
         <td>{{$item->descripcion}}</td>
-        <td>{{$item->lugar}}</td>
+        <td>{{$item->lugar->nombre}}</td>
 
         <td class='center'>
           <a  href="{{ url('/editar-muestras/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}"

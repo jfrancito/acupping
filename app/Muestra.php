@@ -37,7 +37,30 @@ class Muestra extends Model {
 	}
 
 	public function cataciones() {
-		return $this->belongsTo('App\Catacion');
+		return $this->hasMany('App\Catacion');
+	}
+
+	public function nombrecomercial() {
+		return $this->belongsTo('App\Nombrecomercial');
+	}
+
+	public function varietal() {
+		return $this->belongsTo('App\Varietal');
+	}
+
+	public function tipoproceso() {
+		return $this->belongsTo('App\Tipoproceso');
+	}
+
+	public function producto() {
+		return $this->belongsTo('App\Producto');
+	}
+
+	public function color() {
+		return $this->belongsTo('App\Color');
+	}
+	public function codigotipomuestras() {
+		return $this->hasMany('App\Codigotipomuetra');
 	}
 
 }

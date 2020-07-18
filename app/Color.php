@@ -4,9 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Sesioncatacion extends Model {
+class Color extends Model {
 
-	protected $table = 'sesioncataciones';
+	protected $table = 'colores';
 	public $timestamps = false;
 	protected $primaryKey = 'id';
 	public $incrementing = false;
@@ -14,14 +14,6 @@ class Sesioncatacion extends Model {
 
 	public function muestras() {
 		return $this->hasMany('App\Muestra');
-	}
-
-	public function lugar() {
-		return $this->belongsTo('App\Lugar');
-	}
-
-	public function sesionusers() {
-		return $this->hasMany('App\Sesionuser');
 	}
 
 }

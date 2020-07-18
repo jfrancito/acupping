@@ -4,24 +4,20 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Catacion extends Model {
+class Codigotipomuestra extends Model {
 
-	protected $table = 'cataciones';
+	protected $table = 'codigotipomuestras';
 	public $timestamps = false;
 	protected $primaryKey = 'id';
 	public $incrementing = false;
 	public $keyType = 'string';
 
-	public function tipocatacion() {
-		return $this->belongsTo('App\Tipocatacion');
-	}
-
 	public function muestra() {
 		return $this->belongsTo('App\Muestra');
 	}
 
-	public function cataciondescriptores() {
-		return $this->hasMany('App\Cataciondescriptor');
+	public function tipomuestra() {
+		return $this->belongsTo('App\Tipomuestra');
 	}
 
 }

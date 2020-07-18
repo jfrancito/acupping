@@ -11,12 +11,17 @@
     <div class='col-xs-3'>
       <div class="slider00000005 slidercatacion"></div>
     </div>
+
+
     <div class='col-xs-9'>
       <ol class="breadcrumb">
         <li class="active selectdescriptores">
           Descriptores <i class="icon icon-right mdi mdi-eye"></i>
         </li>
       </ol>
+      <div class='ajax_lista_descriptores_00000005'>
+        @include('catacion.ajax.adescriptorcatacion', ['tipocatacion_codigo' => '00000005'])
+      </div>
     </div>
 
 
@@ -24,7 +29,10 @@
 
   <div class="panel-body panel-descriptores">
     <div class='col-xs-12'>
-      descriptores
+      <div class='ajax-descriptores'>
+
+
+      </div>
     </div>
   </div>
 </div>

@@ -16,4 +16,8 @@ class Especie extends Model {
 		return $this->hasMany('App\Muestra');
 	}
 
+	public function verietales() {
+		return $this->hasMany('App\Varietal');
+	}
+
 }

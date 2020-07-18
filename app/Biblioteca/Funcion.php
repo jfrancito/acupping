@@ -2,11 +2,18 @@
 namespace App\Biblioteca;
 
 use App\Aniocosecha;
+use App\Codigotipomuestra;
+use App\Color;
 use App\Especie;
+use App\Lugar;
+use App\Nombrecomercial;
 use App\Pais;
+use App\Producto;
 use App\Rolopcion;
 use App\Tipomuestra;
+use App\Tipoproceso;
 use App\User;
+use App\Varietal;
 use Hashids;
 use Illuminate\Support\Facades\DB;
 use Redirect;
@@ -15,6 +22,102 @@ use table;
 
 class Funcion {
 
+	public function codigo_muestra_agregando_historial($muestra_id, $tipomuestra_id) {
+		$codigo = Codigotipomuestra::where('tipomuestra_id', '=', $tipomuestra_id)->max('correlativo');
+		$tipomuestra = Tipomuestra::where('id', '=', $tipomuestra_id)->first();
+		if (is_null($codigo)) {
+			$codigo = 1;
+		} else {
+			$codigo = $codigo + 1;
+		}
+		//concatenar con ceros
+		$codigo_completo = str_pad($codigo, 8, "0", STR_PAD_LEFT);
+		$codigo_completo = $tipomuestra->abreviatura . $codigo_completo;
+
+		//desactivar los otros codigos
+		$listacodigotipomuestra = Codigotipomuestra::where('muestra_id', '=', $muestra_id)->get();
+
+		foreach ($listacodigotipomuestra as $key => $item) {
+			$item->activo = 0;
+			$item->fecha_mod = date('Ymd h:i:s');
+			$item->usuario_mod = Session::get('usuario')->usuario_solomon_id;
+			$item->save();
+		}
+		// crear nuevo codigo
+
+		$id = $this->getCreateIdMaestra('codigotipomuestras');
+		$codigomuestra = new Codigotipomuestra;
+		$codigomuestra->id = $id;
+		$codigomuestra->codigo = $codigo_completo;
+		$codigomuestra->correlativo = $codigo;
+		$codigomuestra->muestra_id = $muestra_id;
+		$codigomuestra->tipomuestra_id = $tipomuestra_id;
+		$codigomuestra->fecha_crea = date('Ymd h:i:s');
+		$codigomuestra->usuario_crea = Session::get('usuario')->usuario_solomon_id;
+		$codigomuestra->save();
+
+		return $codigo_completo;
+	}
+
+	public function combo_colores() {
+		$combo_colores = Color::where('activo', '=', 1)
+			->pluck('nombre', 'id')
+			->toArray();
+		return $combo_colores;
+	}
+
+	public function combo_productos() {
+		$combo_productos = Producto::where('activo', '=', 1)
+			->pluck('nombre', 'id')
+			->toArray();
+		return $combo_productos;
+	}
+
+	public function combo_tipoprocesos() {
+		$combo_tipoprocesos = Tipoproceso::where('activo', '=', 1)
+			->pluck('nombre', 'id')
+			->toArray();
+		return $combo_tipoprocesos;
+	}
+
+	public function combo_varietales_especies($especie_id) {
+		$combo_varietales = Varietal::where('activo', '=', 1)
+			->where('especie_id', '=', $especie_id)
+			->pluck('nombre', 'id')
+			->toArray();
+		return $combo_varietales;
+	}
+
+	public function combo_nombrecomerciales() {
+		$combo_nombrecomerciales = Nombrecomercial::where('activo', '=', 1)
+			->pluck('nombre', 'id')
+			->toArray();
+		return $combo_nombrecomerciales;
+	}
+
+	public function combo_usuarios_menos_yo($usuario_id) {
+		$combo_usuarios_menos_yo = User::where('activo', '=', 1)
+			->where('id', '<>', '1CIX00000001')
+			->where('id', '<>', $usuario_id)
+			->pluck('nombre', 'id')
+			->toArray();
+
+		return $combo_usuarios_menos_yo;
+	}
+
+	public function combo_usuarios() {
+		$combo_usuarios = User::where('activo', '=', 1)
+			->pluck('nombre', 'id')
+			->toArray();
+		return $combo_usuarios;
+	}
+
+	public function combo_lugares() {
+		$combo_lugares = Lugar::where('activo', '=', 1)
+			->pluck('nombre', 'id')
+			->toArray();
+		return $combo_lugares;
+	}
 	public function combo_especies() {
 		$combo_especies = Especie::where('activo', '=', 1)
 			->pluck('nombre', 'id')

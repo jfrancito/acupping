@@ -29,7 +29,10 @@
                         data_alias='{{$item->alias}}'
                         data_opcion='{{$idopcion}}'
                         data_muestra='{{$item->id}}'>
-                      <a href="#{{$item->alias}}" data-toggle="tab">{{$item->alias}}</a>
+                      <a href="#{{$item->alias}}" data-toggle="tab">
+                        {{$item->alias}}<br>
+                        <strong>{{$item->codigo}}</strong>
+                      </a>
                     </li>
                   @endforeach
                 </ul>
