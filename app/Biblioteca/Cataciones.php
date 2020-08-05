@@ -1,6 +1,7 @@
 <?php
 namespace App\Biblioteca;
 use App\Catacion;
+use App\Cataciondescriptor;
 use App\Descriptor;
 use App\Descriptortipocatacion;
 use App\Muestra;
@@ -11,6 +12,176 @@ use DB;
 use Session;
 
 class Cataciones {
+
+	public function array_padres($array_listacatacion) {
+
+		$array_cataciondescriptores = Cataciondescriptor::join('descriptortipocataciones', 'cataciondescriptores.descriptortipocatacion_id', '=', 'descriptortipocataciones.id')
+			->wherein('catacion_id', $array_listacatacion)->where('cataciondescriptores.activo', '=', '1')
+			->select('descriptortipocataciones.descriptor_id')
+			->groupBy('descriptortipocataciones.descriptor_id')
+			->get();
+
+		$listaid = array();
+		$i = 0;
+
+		foreach ($array_cataciondescriptores as $key => $item) {
+
+			$descriptor = Descriptor::where('id', '=', $item->descriptor_id)->first();
+			//nivel 1
+			$nivel1 = Descriptor::where('codigo', '=', $descriptor->padre)->first();
+			if (count($nivel1) > 0) {
+				$listaid[$i] = $nivel1->id;
+				$i = $i + 1;
+
+				$nivel2 = Descriptor::where('codigo', '=', $nivel1->padre)->first();
+				if (count($nivel2) > 0) {
+					$listaid[$i] = $nivel2->id;
+					$i = $i + 1;
+					$nivel3 = Descriptor::where('codigo', '=', $nivel2->padre)->first();
+
+					if (count($nivel3) > 0) {
+						$listaid[$i] = $nivel3->id;
+						$i = $i + 1;
+					}
+				}
+			}
+		}
+
+		return $listaid;
+
+	}
+	public function data_rueda_sabores($muestra_id) {
+		$muestra = Muestra::where('id', '=', $muestra_id)->first();
+
+		$array_listacatacion = Catacion::where('muestra_id', '=', $muestra_id)->pluck('id')->toArray();
+
+		$array_padres = $this->array_padres($array_listacatacion);
+
+		$array_cataciondescriptores_tipo = Cataciondescriptor::join('descriptortipocataciones', 'cataciondescriptores.descriptortipocatacion_id', '=', 'descriptortipocataciones.id')
+			->wherein('catacion_id', $array_listacatacion)->where('cataciondescriptores.activo', '=', '1')
+			->select('descriptortipocataciones.descriptor_id')
+			->groupBy('descriptortipocataciones.descriptor_id')
+			->pluck('descriptortipocataciones.descriptor_id')->toArray();
+
+		$array_cataciondescriptores = Descriptor::wherein('id', $array_cataciondescriptores_tipo)
+			->orwherein('id', $array_padres)
+			->select('id')
+			->groupBy('id')
+			->pluck('id')->toArray();
+
+		//dd($array_cataciondescriptores);
+
+		$lista_descriptores_nivel_1 = Descriptor::wherein('id', $array_cataciondescriptores)->where('nivel', '=', '1')->get();
+		$array_padre = array("name" => "Acupping", "color" => "#ffffff");
+
+		$array_padre1 = array();
+
+		foreach ($lista_descriptores_nivel_1 as $key => $item) {
+
+			$valor_torta = $this->valor_torta($item, $array_cataciondescriptores, count($lista_descriptores_nivel_1));
+
+			if ($valor_torta <= 0) {
+				$array_1 = array("name" => $item->nombre, "color" => "#bdbdbd");
+			} else {
+				$array_1 = array("name" => $item->nombre, "size" => $valor_torta, "color" => "#bdbdbd");
+			}
+
+			//nivel 2
+			$lista_descriptores_nivel_2 = Descriptor::wherein('id', $array_cataciondescriptores)
+				->where('padre', '=', $item->codigo)->where('nivel', '=', '2')->get();
+			$array_padre2 = array();
+			if (count($lista_descriptores_nivel_2)) {
+				foreach ($lista_descriptores_nivel_2 as $key2 => $item2) {
+
+					$valor_torta = $this->valor_torta($item2, $array_cataciondescriptores, count($lista_descriptores_nivel_1));
+
+					if ($valor_torta <= 0) {
+						$array_2 = array("name" => $item2->nombre, "color" => "#bdbdbd");
+					} else {
+						$array_2 = array("name" => $item2->nombre, "size" => $valor_torta, "color" => "#bdbdbd");
+					}
+
+					//nivel 3
+					$lista_descriptores_nivel_3 = Descriptor::wherein('id', $array_cataciondescriptores)
+						->where('padre', '=', $item2->codigo)->where('nivel', '=', '3')->get();
+					$array_padre3 = array();
+
+					if (count($lista_descriptores_nivel_3)) {
+						foreach ($lista_descriptores_nivel_3 as $key3 => $item3) {
+
+							$valor_torta = $this->valor_torta($item3, $array_cataciondescriptores, count($lista_descriptores_nivel_1));
+
+							if ($valor_torta <= 0) {
+								$array_3 = array("name" => $item3->nombre, "color" => "#bdbdbd");
+							} else {
+								$array_3 = array("name" => $item3->nombre, "size" => $valor_torta, "color" => "#bdbdbd");
+							}
+
+							//nivel 4
+							$lista_descriptores_nivel_4 = Descriptor::wherein('id', $array_cataciondescriptores)
+								->where('padre', '=', $item3->codigo)->where('nivel', '=', '4')->get();
+							$array_padre4 = array();
+
+							if (count($lista_descriptores_nivel_4)) {
+
+								foreach ($lista_descriptores_nivel_4 as $key4 => $item4) {
+
+									$valor_torta = $this->valor_torta($item4, $array_cataciondescriptores, count($lista_descriptores_nivel_1));
+
+									if ($valor_torta <= 0) {
+										$array_4 = array("name" => $item4->nombre, "color" => "#bdbdbd");
+									} else {
+										$array_4 = array("name" => $item4->nombre, "size" => $valor_torta, "color" => "#bdbdbd");
+									}
+
+									array_push($array_padre4, $array_4);
+								}
+								$array_3 = $array_3 + array("children" => $array_padre4);
+
+							}
+							//nivel 4
+
+							array_push($array_padre3, $array_3);
+						}
+						$array_2 = $array_2 + array("children" => $array_padre3);
+					}
+					//nivel 3
+
+					array_push($array_padre2, $array_2);
+				}
+				$array_1 = $array_1 + array("children" => $array_padre2);
+			}
+			//nivel 2
+
+			array_push($array_padre1, $array_1);
+
+		}
+
+		$array_padre = $array_padre + array("children" => $array_padre1);
+
+		return json_encode($array_padre, false);
+
+	}
+	public function quitar_numeros_json($data_rueda_sabores) {
+
+		for ($i = 0; $i < 10; $i++) {
+			$data_rueda_sabores = str_replace("children" . $i, "children", $data_rueda_sabores);
+		}
+		return $data_rueda_sabores;
+	}
+
+	public function valor_torta($descriptor, $array_cataciondescriptores, $counttorta) {
+
+		$lista_descriptores = Descriptor::wherein('id', $array_cataciondescriptores)->where('padre', '=', $descriptor->codigo)->get();
+		if (count($lista_descriptores) > 0) {
+			$valor = 0;
+		} else {
+			$lista_descriptores_acabo = Descriptor::wherein('id', $array_cataciondescriptores)->where('padre', '=', $descriptor->padre)->get();
+			$valor = 100 / $counttorta / count($lista_descriptores_acabo);
+		}
+
+		return $valor;
+	}
 
 	public function desactivar_poner_prioridad($muestra_id, $descriptor_id, $listacataciondescriptores) {
 

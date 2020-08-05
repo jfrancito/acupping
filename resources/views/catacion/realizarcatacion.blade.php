@@ -21,7 +21,8 @@
               <span class="panel-subtitle">Incio : {{date_format(date_create(date($sessioncatacion->fecha)), 'd-m-Y H:i:s')}}</span>
 
               <div  class="tools btn-resumen-session"
-                    data_sessioncatacion_id="{{$sessioncatacion->id}}">
+                    data_sessioncatacion_id="{{$sessioncatacion->id}}"
+                    data_opcion = '{{$idopcion}}'>
                 <span class="icon mdi mdi-save"> <br><strong>Guardar</strong></span>
               </div>
 

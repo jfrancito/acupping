@@ -25,12 +25,23 @@ class CatacionController extends Controller {
 			->where('codigo', '<>', '00000013')->orderBy('id', 'asc')->get();
 		$muestra = Muestra::where('id', '=', $idmuestra)->orderBy('id', 'asc')->first();
 		$funcion = $this;
+		$data_rueda_sabores = $this->catacion->data_rueda_sabores($idmuestra);
+		$data_rueda_sabores = $this->catacion->quitar_numeros_json($data_rueda_sabores);
+		$array_listacatacion = Catacion::where('muestra_id', '=', $idmuestra)->pluck('id')->toArray();
+		$array_cataciondescriptores_tipo = Cataciondescriptor::join('descriptortipocataciones', 'cataciondescriptores.descriptortipocatacion_id', '=', 'descriptortipocataciones.id')
+			->wherein('catacion_id', $array_listacatacion)->where('cataciondescriptores.activo', '=', '1')
+			->select('descriptortipocataciones.descriptor_id')
+			->groupBy('descriptortipocataciones.descriptor_id')
+			->pluck('descriptortipocataciones.descriptor_id')->toArray();
+
 		return View::make('catacion/rerportemuestra',
 			[
 				'idopcion' => $idopcion,
 				'listatipocatacion' => $listatipocatacion,
 				'muestra' => $muestra,
 				'funcion' => $funcion,
+				'data' => $data_rueda_sabores,
+				'array_cataciondescriptores_tipo' => $array_cataciondescriptores_tipo,
 			]);
 
 	}
@@ -121,17 +132,23 @@ class CatacionController extends Controller {
 	public function actionCerrarSesionCatacion(Request $request) {
 
 		$sessioncatacion_id = $request['sesioncatacion'];
+		$idopcion = $request['idopcion'];
+
 		$sesioncatacion = Sesioncatacion::where('id', '=', $sessioncatacion_id)->first();
 		$sesioncatacion->estado_id = '1CIX00000003';
 		$sesioncatacion->fecha_mod = date("Ymd h:i:s");
 		$sesioncatacion->usuario_mod = Session::get('usuario')->usuario_solomon_id;
 		$sesioncatacion->save();
 
+		return Redirect::to('/revisar-catacion/' . $idopcion . '/' . Hashids::encode(substr($sessioncatacion_id, -8)))->with('bienhecho', 'Sesion de catacion ' . $sesioncatacion->codigo . ' cerrado con exito');
+
 	}
 
 	public function actionAjaxModalDetalleMuestras(Request $request) {
 
 		$sessioncatacion_id = $request['sessioncatacion_id'];
+		$data_opcion = $request['data_opcion'];
+
 		$sessioncatacion = Sesioncatacion::where('id', '=', $sessioncatacion_id)->first();
 		$listatipocatacion = Tipocatacion::where('id', '<>', '1CIX00000013')
 			->orderBy('id', 'asc')->get();
@@ -142,6 +159,7 @@ class CatacionController extends Controller {
 				'sessioncatacion' => $sessioncatacion,
 				'listatipocatacion' => $listatipocatacion,
 				'funcion' => $funcion,
+				'idopcion' => $data_opcion,
 			]);
 
 	}

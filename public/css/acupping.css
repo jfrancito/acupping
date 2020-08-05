@@ -1,4 +1,14 @@
-
+svg{
+  width: 1200px !important;
+  height: : 500px !important;
+}
+.text-stroke{
+  font-weight: bold !important;
+  font-size: 1.3em;
+}
+.text-contour{
+  display: none !important;
+}
 .tabla-reporte i{
   color: #34a853 !important;
 }

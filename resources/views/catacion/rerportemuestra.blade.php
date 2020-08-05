@@ -5,7 +5,6 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/select2/css/select2.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/slider-barras/css/slider.css') }} "/>
-    <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/chart/css/chart.css') }} "/>
 
 @stop
 @section('section')
@@ -23,10 +22,14 @@
           <div class="panel-body">
             <div class="panel panel-default">
 
-		      <div class="col-md-6">
-					<div style="margin-left:80px;" id="chart"></div>
+          @if(count($array_cataciondescriptores_tipo)>0)
+		      <div class="col-md-12">
+
+					  <div id="chart"></div>
+
 		      </div>
-		      <div class="col-md-6">
+          @endif
+		      <div class="col-md-12">
 					<table class="table tabla-reporte" style="font-size: 1em;">
 						<tbody>
 								<tr>
@@ -76,7 +79,7 @@
         </div>
       </div>
     </div>
-
+    <input type="hidden" name="data" id = "data" value='{{$data}}'>
 
   </div>
 </div>
@@ -104,7 +107,6 @@
   <script src="{{ asset('public/js/general/navAccordion.js?v='.$version) }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/jquery.niftymodals/dist/jquery.niftymodals.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/chart/js/chart.js') }}" type="text/javascript"></script>
-  <script src="{{ asset('public/lib/chart/js/main.js?v='.$version) }}" type="text/javascript"></script>
 
   <script type="text/javascript">
 
@@ -130,7 +132,24 @@
         'placeholder': '0'
       });
 
+      var obj = $.parseJSON($('#data').val());
+      const data = obj;
+
+      Sunburst()
+        .data(data)
+        .size('size')
+        .color('color')
+        .radiusScaleExponent(0.7)
+        (document.getElementById('chart'));
+
+
     });
+
+
+
+
+
+
   </script>
 
   <script src="{{ asset('public/js/catacion/catacion.js?v='.$version) }}" type="text/javascript"></script>

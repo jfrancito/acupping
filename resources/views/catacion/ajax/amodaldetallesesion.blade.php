@@ -56,6 +56,7 @@
 	      class="form-horizontal group-border-dashed">
 	  	{{ csrf_field() }}
 		<input type="hidden" name="sesioncatacion" value='{{$sessioncatacion->id}}'>
+		<input type="hidden" name="idopcion" value='{{$idopcion}}'>
 		<button type="submit" data-dismiss="modal" class="btn btn-success modal-close">Guardar</button>
 	</form>
 

@@ -27,8 +27,6 @@
 </div>
 
 
-
-
 <table class="table" style="font-size: 1em;">
 <thead>
   <tr>

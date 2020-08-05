@@ -12,6 +12,8 @@ $(document).ready(function(){
 
         var _token                            = $('#token').val();
         var data_sessioncatacion_id           = $(this).attr('data_sessioncatacion_id');
+        var data_opcion                       = $(this).attr('data_opcion');
+
 
         $.ajax({
             
@@ -19,7 +21,8 @@ $(document).ready(function(){
             url     :   carpeta+"/ajax-modal-detalle-muestras",
             data    :   {
                             _token                  : _token,
-                            sessioncatacion_id      : data_sessioncatacion_id
+                            sessioncatacion_id      : data_sessioncatacion_id,
+                            data_opcion             : data_opcion,
                         },    
             success: function (data) {
                 $('.modal-detalle-muestras').html(data);
