@@ -63,4 +63,8 @@ class Muestra extends Model {
 		return $this->hasMany('App\Codigotipomuetra');
 	}
 
+	public function muestradescriptores() {
+		return $this->hasMany('App\Muestradescriptor');
+	}
+
 }

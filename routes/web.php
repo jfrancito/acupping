@@ -61,5 +61,15 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-lista-descriptores-catacion', 'CatacionController@actionAjaxListaDescriptoresCatacion');
 	Route::any('/ajax-eliminar-descriptores-catacion', 'CatacionController@actionAjaxEliminarDescriptoresCatacion');
 	Route::any('/ajax-combo-varietales-especie', 'CatacionController@actionAjaxComboVarietalesEspecie');
+	Route::any('/ajax-subir-bajar-prioridades', 'CatacionController@actionAjaxSubirBajarPrioridades');
+	Route::any('/ajax-actualizar-descriptores-muestras', 'CatacionController@actionAjaxActualizarDescriptoresMuestra');
+	Route::any('/ajax-recalcular-puntaje-catacion-muestra-defecto', 'CatacionController@actionAjaxRecalcularPuntajeCatacionMuestraDefecto');
+	Route::any('/ajax-modal-detalle-muestras', 'CatacionController@actionAjaxModalDetalleMuestras');
+	Route::any('/cerrar-sesion-catacion', 'CatacionController@actionCerrarSesionCatacion');
+
+	Route::any('/revisar-catacion/{idopcion}/{idsesioncatacion}', 'CatacionController@actionRevisarCatacion');
+	Route::any('/ajax-mostrar-form-catacion-revisar', 'CatacionController@actionAjaxMostrarFormCatacionRevisar');
+
+	Route::any('/ver-reporte-muestra/{idmuestra}/{idopcion}', 'CatacionController@actionVerReporteMuestra');
 
 });

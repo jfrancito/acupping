@@ -6,6 +6,7 @@ use App\Catacion;
 use App\Cataciondescriptor;
 use App\Lugar;
 use App\Muestra;
+use App\Muestradescriptor;
 use App\Sesioncatacion;
 use App\Sesionuser;
 use App\Tipocatacion;
@@ -17,6 +18,186 @@ use Session;
 use View;
 
 class CatacionController extends Controller {
+
+	public function actionVerReporteMuestra($idmuestra, $idopcion) {
+
+		$listatipocatacion = Tipocatacion::where('codigo', '<>', '00000001')
+			->where('codigo', '<>', '00000013')->orderBy('id', 'asc')->get();
+		$muestra = Muestra::where('id', '=', $idmuestra)->orderBy('id', 'asc')->first();
+		$funcion = $this;
+		return View::make('catacion/rerportemuestra',
+			[
+				'idopcion' => $idopcion,
+				'listatipocatacion' => $listatipocatacion,
+				'muestra' => $muestra,
+				'funcion' => $funcion,
+			]);
+
+	}
+
+	public function actionRevisarCatacion($idopcion, $idsesioncatacion) {
+
+		$idsesioncatacion = $this->funciones->decodificarmaestra($idsesioncatacion);
+
+		if (Session::get('muestra_id')) {
+			$muestra = Muestra::where('sesioncatacion_id', '=', $idsesioncatacion)->where('id', '=', Session::get('muestra_id'))->first();
+			Session::flash('bienhecho', 'Muetra ' . $muestra->alias . ' modificado con exito');
+		} else {
+			$muestra = Muestra::where('sesioncatacion_id', '=', $idsesioncatacion)->orderBy('id', 'asc')->first();
+		}
+		$sessioncatacion = Sesioncatacion::where('id', '=', $idsesioncatacion)->first();
+		$listamuestas = Muestra::where('sesioncatacion_id', '=', $idsesioncatacion)->orderBy('id', 'asc')->get();
+
+		$array_listamuestras = Muestra::where('sesioncatacion_id', '=', $idsesioncatacion)->pluck('id')->toArray();
+		$array_listacatacion = Catacion::wherein('muestra_id', $array_listamuestras)->pluck('id')->toArray();
+		$listacataciondescriptores = Cataciondescriptor::wherein('catacion_id', $array_listacatacion)->where('activo', '=', '1')->get();
+
+		$listamuestradescriptores = Muestradescriptor::where('muestra_id', '=', $muestra->id)->where('activo', '=', '1')
+			->orderBy('prioridad', 'asc')->get();
+		$funcion = $this;
+		$array_nivel_tueste = $this->catacion->array_nivel_tueste();
+		$combo_numerotazas = $this->funciones->combo_numerotazas();
+		$combo_intensidad = $this->funciones->combo_intensidad();
+
+		$listatipocatacion = Tipocatacion::orderBy('id', 'asc')->get();
+
+		return View::make('catacion/revisarcatacion',
+			[
+				'idopcion' => $idopcion,
+				'sessioncatacion' => $sessioncatacion,
+				'listamuestas' => $listamuestas,
+				'muestra' => $muestra,
+				'muestra_id' => $muestra->id,
+				'array_nivel_tueste' => $array_nivel_tueste,
+				'listacataciondescriptores' => $listacataciondescriptores,
+				'listamuestradescriptores' => $listamuestradescriptores,
+				'listatipocatacion' => $listatipocatacion,
+				'combo_numerotazas' => $combo_numerotazas,
+				'combo_intensidad' => $combo_intensidad,
+				'funcion' => $funcion,
+				'revisar' => true,
+			]);
+	}
+
+	public function actionAjaxMostrarFormCatacionRevisar(Request $request) {
+		$idopcion = $request['idopcion'];
+		$muestra = Muestra::where('id', '=', $request['muestra_id'])->first();
+		$sessioncatacion = Sesioncatacion::where('id', '=', $muestra->sesioncatacion_id)->first();
+		$listamuestas = Muestra::where('sesioncatacion_id', '=', $muestra->sesioncatacion_id)->orderBy('id', 'asc')->get();
+		$funcion = $this;
+		$array_nivel_tueste = $this->catacion->array_nivel_tueste();
+
+		$array_listamuestras = Muestra::where('sesioncatacion_id', '=', $muestra->sesioncatacion_id)->pluck('id')->toArray();
+		$array_listacatacion = Catacion::wherein('muestra_id', $array_listamuestras)->pluck('id')->toArray();
+		$listacataciondescriptores = Cataciondescriptor::wherein('catacion_id', $array_listacatacion)->where('activo', '=', '1')->get();
+
+		$listamuestradescriptores = Muestradescriptor::where('muestra_id', '=', $muestra->id)->where('activo', '=', '1')
+			->orderBy('prioridad', 'asc')->get();
+
+		$combo_numerotazas = $this->funciones->combo_numerotazas();
+		$combo_intensidad = $this->funciones->combo_intensidad();
+		$listatipocatacion = Tipocatacion::orderBy('id', 'asc')->get();
+
+		return View::make('catacion/form/formcatacionrevisar',
+			[
+				'muestra' => $muestra,
+				'sessioncatacion' => $sessioncatacion,
+				'listamuestas' => $listamuestas,
+				'listacataciondescriptores' => $listacataciondescriptores,
+				'listamuestradescriptores' => $listamuestradescriptores,
+				'funcion' => $funcion,
+				'muestra_id' => $muestra->id,
+				'array_nivel_tueste' => $array_nivel_tueste,
+				'idopcion' => $idopcion,
+				'combo_numerotazas' => $combo_numerotazas,
+				'combo_intensidad' => $combo_intensidad,
+				'listatipocatacion' => $listatipocatacion,
+				'ajax' => true,
+				'revisar' => true,
+			]);
+
+	}
+
+	public function actionCerrarSesionCatacion(Request $request) {
+
+		$sessioncatacion_id = $request['sesioncatacion'];
+		$sesioncatacion = Sesioncatacion::where('id', '=', $sessioncatacion_id)->first();
+		$sesioncatacion->estado_id = '1CIX00000003';
+		$sesioncatacion->fecha_mod = date("Ymd h:i:s");
+		$sesioncatacion->usuario_mod = Session::get('usuario')->usuario_solomon_id;
+		$sesioncatacion->save();
+
+	}
+
+	public function actionAjaxModalDetalleMuestras(Request $request) {
+
+		$sessioncatacion_id = $request['sessioncatacion_id'];
+		$sessioncatacion = Sesioncatacion::where('id', '=', $sessioncatacion_id)->first();
+		$listatipocatacion = Tipocatacion::where('id', '<>', '1CIX00000013')
+			->orderBy('id', 'asc')->get();
+		$funcion = $this;
+
+		return View::make('catacion/ajax/amodaldetallesesion',
+			[
+				'sessioncatacion' => $sessioncatacion,
+				'listatipocatacion' => $listatipocatacion,
+				'funcion' => $funcion,
+			]);
+
+	}
+
+	public function actionAjaxActualizarDescriptoresMuestra(Request $request) {
+
+		$muestra_id = $request['muestra_id'];
+		$listamuestradescriptores = Muestradescriptor::where('muestra_id', '=', $muestra_id)->where('activo', '=', '1')
+			->orderBy('prioridad', 'asc')->get();
+
+		return View::make('catacion/ajax/adescriptormuestras',
+			[
+				'listamuestradescriptores' => $listamuestradescriptores,
+			]);
+
+	}
+
+	public function actionAjaxSubirBajarPrioridades(Request $request) {
+
+		$muestra_descriptor_id = $request['muestra_descriptor_id'];
+		$accion = $request['accion'];
+		$muestra_id = $request['muestra_id'];
+
+		if ($accion == 'btn_bottom') {
+
+			$muestra_descritor_bajar = Muestradescriptor::where('id', '=', $muestra_descriptor_id)->first();
+			$muestra_descritor_subir = Muestradescriptor::where('muestra_id', '=', $muestra_descritor_bajar->muestra_id)
+				->where('prioridad', '=', $muestra_descritor_bajar->prioridad + 1)->first();
+
+		} else {
+
+			$muestra_descritor_subir = Muestradescriptor::where('id', '=', $muestra_descriptor_id)->first();
+			$muestra_descritor_bajar = Muestradescriptor::where('muestra_id', '=', $muestra_descritor_subir->muestra_id)
+				->where('prioridad', '=', $muestra_descritor_subir->prioridad - 1)->first();
+
+		}
+
+		$muestra_descritor_bajar->prioridad = $muestra_descritor_bajar->prioridad + 1;
+		$muestra_descritor_bajar->fecha_mod = date("Ymd h:i:s");
+		$muestra_descritor_bajar->usuario_mod = Session::get('usuario')->usuario_solomon_id;
+		$muestra_descritor_bajar->save();
+
+		$muestra_descritor_subir->prioridad = $muestra_descritor_subir->prioridad - 1;
+		$muestra_descritor_subir->fecha_mod = date("Ymd h:i:s");
+		$muestra_descritor_subir->usuario_mod = Session::get('usuario')->usuario_solomon_id;
+		$muestra_descritor_subir->save();
+
+		$listamuestradescriptores = Muestradescriptor::where('muestra_id', '=', $muestra_id)->where('activo', '=', '1')
+			->orderBy('prioridad', 'asc')->get();
+
+		return View::make('catacion/ajax/adescriptormuestras',
+			[
+				'listamuestradescriptores' => $listamuestradescriptores,
+			]);
+
+	}
 
 	public function actionAjaxEliminarDescriptoresCatacion(Request $request) {
 
@@ -36,6 +217,14 @@ class CatacionController extends Controller {
 		$array_listacatacion = Catacion::wherein('muestra_id', $array_listamuestras)->pluck('id')->toArray();
 		$listacataciondescriptores = Cataciondescriptor::wherein('catacion_id', $array_listacatacion)->where('activo', '=', '1')->get();
 
+		$array_listamuestras_p = Muestra::where('sesioncatacion_id', '=', $muestra->sesioncatacion->id)
+			->where('id', '=', $muestra_id)->pluck('id')->toArray();
+		$array_listacatacion_p = Catacion::wherein('muestra_id', $array_listamuestras_p)->pluck('id')->toArray();
+		$listacataciondescriptores_p = Cataciondescriptor::wherein('catacion_id', $array_listacatacion_p)->where('activo', '=', '1')->get();
+
+		$descriptor_id = $catacion_descriptor->descriptortipocatacion->descriptor_id;
+		$this->catacion->desactivar_poner_prioridad($muestra_id, $descriptor_id, $listacataciondescriptores_p);
+
 		return View::make('catacion/ajax/adescriptorcatacion',
 			[
 				'listacataciondescriptores' => $listacataciondescriptores,
@@ -50,9 +239,12 @@ class CatacionController extends Controller {
 		$descriptortipocatacion_id = $request['descriptortipocatacion_id'];
 		$data_catacion_id = $request['data_catacion_id'];
 		$tipocatacion_codigo = $request['tipocatacion_codigo'];
+		$data_muestra_id = $request['muestra_id'];
 
 		$cataciondescriptor = Cataciondescriptor::where('descriptortipocatacion_id', '=', $descriptortipocatacion_id)
 			->where('catacion_id', '=', $data_catacion_id)->first();
+
+		//dd($cataciondescriptor);
 
 		if (count($cataciondescriptor) <= 0) {
 			$id = $this->funciones->getCreateIdMaestra('cataciondescriptores');
@@ -63,17 +255,23 @@ class CatacionController extends Controller {
 			$cabecera->descriptortipocatacion_id = $descriptortipocatacion_id;
 			$cabecera->catacion_id = $data_catacion_id;
 			$cabecera->save();
+
+			$descriptor_id = $cabecera->descriptortipocatacion->descriptor_id;
 		} else {
 			$cataciondescriptor->activo = 1;
 			$cataciondescriptor->fecha_mod = date("Ymd h:i:s");
 			$cataciondescriptor->usuario_mod = Session::get('usuario')->usuario_solomon_id;
 			$cataciondescriptor->save();
+
+			$descriptor_id = $cataciondescriptor->descriptortipocatacion->descriptor_id;
 		}
 
 		$catacion = Catacion::where('id', '=', $data_catacion_id)->first();
 		$array_listamuestras = Muestra::where('sesioncatacion_id', '=', $catacion->muestra->sesioncatacion->id)->pluck('id')->toArray();
 		$array_listacatacion = Catacion::wherein('muestra_id', $array_listamuestras)->pluck('id')->toArray();
 		$listacataciondescriptores = Cataciondescriptor::wherein('catacion_id', $array_listacatacion)->where('activo', '=', '1')->get();
+
+		$this->catacion->activar_poner_prioridad($data_muestra_id, $descriptor_id);
 
 		return View::make('catacion/ajax/adescriptorcatacion',
 			[
@@ -155,10 +353,13 @@ class CatacionController extends Controller {
 			$cabecera->lugar_id = $lugar_id;
 			$cabecera->identificador_muestra = 'DI';
 			$cabecera->numeros_muestra = $numeros_muestra;
+			$cabecera->puntaje = 0.00;
+			$cabecera->estado_id = '1CIX00000001';
 			$cabecera->fecha_crea = date("Ymd h:i:s");
 			$cabecera->usuario_crea = Session::get('usuario')->usuario_solomon_id;
 			$cabecera->save();
 
+			$idsesioncatacion = $id;
 			//agregar usuarios a sesion catacion
 
 			$invitarusuarios = $request['invitarusuarios'];
@@ -240,6 +441,24 @@ class CatacionController extends Controller {
 					$catacion->save();
 				}
 				$this->catacion->puntaje_muestra($item->id);
+			}
+
+			$this->catacion->puntaje_session_catacion($idsesioncatacion);
+			$listadescriptorprioridad = $this->catacion->lista_descriptores_prioridad();
+			//muestra con descriptores prioridad
+			foreach ($listamuestas as $key => $item) {
+				foreach ($listadescriptorprioridad as $keytc => $itemtc) {
+
+					$muestradescriptor_id = $this->funciones->getCreateIdMaestra('muestradescriptores');
+
+					$muestradescriptor = new Muestradescriptor;
+					$muestradescriptor->id = $muestradescriptor_id;
+					$muestradescriptor->fecha_crea = $this->fechaactual;
+					$muestradescriptor->usuario_crea = Session::get('usuario')->usuario_solomon_id;
+					$muestradescriptor->muestra_id = $item->id;
+					$muestradescriptor->descriptor_id = $itemtc->id;
+					$muestradescriptor->save();
+				}
 			}
 
 			return Redirect::to('/gestion-de-sesiones-catacion/' . $idopcion)->with('bienhecho', 'Sesion de catacion ' . $codigo . ' registrado con exito');
@@ -560,16 +779,25 @@ class CatacionController extends Controller {
 		$array_listacatacion = Catacion::wherein('muestra_id', $array_listamuestras)->pluck('id')->toArray();
 		$listacataciondescriptores = Cataciondescriptor::wherein('catacion_id', $array_listacatacion)->where('activo', '=', '1')->get();
 
+		$listamuestradescriptores = Muestradescriptor::where('muestra_id', '=', $muestra->id)->where('activo', '=', '1')
+			->orderBy('prioridad', 'asc')->get();
+
+		$combo_numerotazas = $this->funciones->combo_numerotazas();
+		$combo_intensidad = $this->funciones->combo_intensidad();
+
 		return View::make('catacion/form/formcatacion',
 			[
 				'muestra' => $muestra,
 				'sessioncatacion' => $sessioncatacion,
 				'listamuestas' => $listamuestas,
 				'listacataciondescriptores' => $listacataciondescriptores,
+				'listamuestradescriptores' => $listamuestradescriptores,
 				'funcion' => $funcion,
 				'muestra_id' => $muestra->id,
 				'array_nivel_tueste' => $array_nivel_tueste,
 				'idopcion' => $idopcion,
+				'combo_numerotazas' => $combo_numerotazas,
+				'combo_intensidad' => $combo_intensidad,
 				'ajax' => true,
 			]);
 
@@ -592,8 +820,14 @@ class CatacionController extends Controller {
 		$array_listacatacion = Catacion::wherein('muestra_id', $array_listamuestras)->pluck('id')->toArray();
 		$listacataciondescriptores = Cataciondescriptor::wherein('catacion_id', $array_listacatacion)->where('activo', '=', '1')->get();
 
+		$listamuestradescriptores = Muestradescriptor::where('muestra_id', '=', $muestra->id)->where('activo', '=', '1')
+			->orderBy('prioridad', 'asc')->get();
+
 		$funcion = $this;
 		$array_nivel_tueste = $this->catacion->array_nivel_tueste();
+
+		$combo_numerotazas = $this->funciones->combo_numerotazas();
+		$combo_intensidad = $this->funciones->combo_intensidad();
 
 		return View::make('catacion/realizarcatacion',
 			[
@@ -604,6 +838,9 @@ class CatacionController extends Controller {
 				'muestra_id' => $muestra->id,
 				'array_nivel_tueste' => $array_nivel_tueste,
 				'listacataciondescriptores' => $listacataciondescriptores,
+				'listamuestradescriptores' => $listamuestradescriptores,
+				'combo_numerotazas' => $combo_numerotazas,
+				'combo_intensidad' => $combo_intensidad,
 				'funcion' => $funcion,
 			]);
 	}
@@ -626,6 +863,30 @@ class CatacionController extends Controller {
 		$puntaje = $this->catacion->retornar_puntaje_muestra($muestra_id);
 		print_r($puntaje);
 	}
+
+	public function actionAjaxRecalcularPuntajeCatacionMuestraDefecto(Request $request) {
+
+		$muestra_id = $request['muestra_id'];
+		$catacion_value = $request['catacion_value'];
+		$tipocatacion_codigo = $request['tipocatacion_codigo'];
+		$intensidad = $request['intensidad'];
+		$numero_tazas = $request['numero_tazas'];
+
+		$tipocatacion = Tipocatacion::where('codigo', '=', $tipocatacion_codigo)->first();
+		$catacion = Catacion::where('muestra_id', '=', $muestra_id)
+			->where('tipocatacion_id', '=', $tipocatacion->id)
+			->first();
+		$catacion->puntaje = $catacion_value;
+		$catacion->value = $catacion_value;
+		$catacion->intensidad = $intensidad;
+		$catacion->numerotasas = $numero_tazas;
+		$catacion->fecha_mod = $this->fechaactual;
+		$catacion->usuario_mod = Session::get('usuario')->usuario_solomon_id;
+		$catacion->save();
+		$puntaje = $this->catacion->retornar_puntaje_muestra($muestra_id);
+		print_r($puntaje);
+	}
+
 	public function actionAjaxNotasCatacionMuestra(Request $request) {
 
 		$muestra_id = $request['muestra_id'];

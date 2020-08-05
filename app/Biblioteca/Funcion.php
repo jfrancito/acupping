@@ -66,6 +66,16 @@ class Funcion {
 		return $combo_colores;
 	}
 
+	public function combo_intensidad() {
+		$combo_intensidad = [0 => 'Intensidad', 2 => 'Ligero', 4 => 'Rechazo'];
+		return $combo_intensidad;
+	}
+
+	public function combo_numerotazas() {
+		$combo_numerotazas = [0 => '0', 1 => '1', 2 => '2', 3 => '3', 4 => '4', 5 => '5'];
+		return $combo_numerotazas;
+	}
+
 	public function combo_productos() {
 		$combo_productos = Producto::where('activo', '=', 1)
 			->pluck('nombre', 'id')

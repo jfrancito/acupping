@@ -19,22 +19,14 @@
         <div class="panel panel-default panel-border-color panel-border-color-primary">
           <div class="panel-heading panel-heading-divider" >SESION DE CATACION #{{$sessioncatacion->codigo}}
               <span class="panel-subtitle">Incio : {{date_format(date_create(date($sessioncatacion->fecha)), 'd-m-Y H:i:s')}}</span>
-
-              <div  class="tools btn-resumen-session"
-                    data_sessioncatacion_id="{{$sessioncatacion->id}}">
-                <span class="icon mdi mdi-save"> <br><strong>Guardar</strong></span>
-              </div>
-
           </div>
 
-
           <div class="panel-body">
-
             <div class="panel panel-default">
               <div class="tab-container">
                 <ul class="nav nav-tabs">
                   @foreach($listamuestas as $index=>$item)
-                    <li class="@if($item->id == $muestra->id) active @endif tabcatacion"
+                    <li class="@if($item->id == $muestra->id) active @endif tabcatacionrevisar"
                         data_alias='{{$item->alias}}'
                         data_opcion='{{$idopcion}}'
                         data_muestra='{{$item->id}}'>
@@ -51,7 +43,15 @@
                   @foreach($listamuestas as $index=>$item)
                   <div id="{{$item->alias}}" class="tab-pane @if($item->id == $muestra->id) active @endif cont cont{{$item->alias}}">
                     @if($item->id == $muestra->id)
-                        @include('catacion.form.formcatacion')
+
+                        <div class='revisarcatacion'>
+                          @include('catacion.ajax.aupdatecatacion')
+                        </div>
+
+                        <div class='updatecatacion' style='display: none;'>
+                          @include('catacion.form.formupdatecatacion')
+                        </div>
+
                     @endif
                   </div>
                   @endforeach

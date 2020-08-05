@@ -2,9 +2,9 @@
   <thead>
     <tr>
       <th>Sesión catación</th>
-      <th>Dueño</th>
+      <th>Responsable</th>
       <th>Fecha y hora</th>
-      <th>Descripción</th>
+      <th>Estado</th>
       <th>Lugar</th>
 
       <th>Información de muestras</th>
@@ -21,7 +21,7 @@
         <td>{{$item->codigo}}</td>
         <td>{{$funcion->funciones->tabla_usuario($item->usuario_crea)->nombre}}</td>
         <td>{{date_format(date_create($item->fecha_crea), 'd-m-Y H:i')}}</td>
-        <td>{{$item->descripcion}}</td>
+        <td>{{$item->estado->nombre}}</td>
         <td>{{$item->lugar->nombre}}</td>
 
         <td class='center'>
@@ -31,20 +31,37 @@
           </a>
         </td>
         <td class='center'>
-          <a  href="{{ url('/modificar-sesion-catacion/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}"
-              class="btn btn-rounded btn-space btn-primary">
-            <i class="icon icon-left mdi mdi-edit"></i>
-          </a>
+          @if($item->estado_id == '1CIX00000003')
+            <a  href="#"
+                class="btn btn-rounded btn-space btn-default btn-bloqueado">
+              <i class="icon icon-left mdi mdi-edit"></i>
+            </a>
+          @else
+            <a  href="{{ url('/modificar-sesion-catacion/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}"
+                class="btn btn-rounded btn-space btn-primary">
+              <i class="icon icon-left mdi mdi-edit"></i>
+            </a>
+          @endif
+
+
         </td>
         <td class='center'>
-          <a  href="{{ url('/realizar-catacion/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}"
-              class="btn btn-rounded btn-space btn-success">
-            <i class="icon icon-left mdi mdi-coffee"></i> catar ahora
-          </a>
+          @if($item->estado_id == '1CIX00000003')
+            <a  href="#"
+                class="btn btn-rounded btn-space btn-default btn-bloqueado">
+              <i class="icon icon-left mdi mdi-coffee"></i> catar ahora
+            </a>
+          @else
+            <a  href="{{ url('/realizar-catacion/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}"
+                class="btn btn-rounded btn-space btn-success">
+              <i class="icon icon-left mdi mdi-coffee"></i> catar ahora
+            </a>
+          @endif
+
         </td>
 
         <td class='center'>
-          <a  href="{{ url('/modificar-sesion-catacion/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}"
+          <a  href="{{ url('/revisar-catacion/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}"
               class="btn btn-rounded btn-space btn-success">
             <i class="icon icon-left mdi mdi-assignment"></i>
           </a>

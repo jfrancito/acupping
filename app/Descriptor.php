@@ -16,4 +16,8 @@ class Descriptor extends Model {
 		return $this->hasMany('App\Descriptortipocatacion');
 	}
 
+	public function muestradescriptores() {
+		return $this->hasMany('App\Muestradescriptor');
+	}
+
 }

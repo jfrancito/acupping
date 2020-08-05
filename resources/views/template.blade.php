@@ -13,7 +13,10 @@
 
 
   <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/perfect-scrollbar/css/perfect-scrollbar.min.css') }}" />
-  <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/material-design-icons/css/material-design-iconic-font.min.css') }} " />
+  <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/material-design-icons/css/material-design-iconic-font.min.css?v='.$version) }} " />
+
+  <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/material-design-iconic-font-v2/css/material-design-iconic-font.min.css?v='.$version) }} " />
+
   <link rel="stylesheet" type="text/css" href="{{ asset('public/css/font-awesome.min.css') }} " />
   <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/scroll/css/scroll.css') }} " />
 

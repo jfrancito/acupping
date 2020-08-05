@@ -14,14 +14,16 @@
 
 
     <div class='col-xs-9'>
-      <ol class="breadcrumb">
-        <li class="active selectdescriptores">
-          Descriptores <i class="icon icon-right mdi mdi-eye"></i>
-        </li>
-      </ol>
-      <div class='ajax_lista_descriptores_00000005'>
-        @include('catacion.ajax.adescriptorcatacion', ['tipocatacion_codigo' => '00000005'])
-      </div>
+      @if(!isset($revisar))
+        <ol class="breadcrumb">
+          <li class="active selectdescriptores">
+            Descriptores <i class="icon icon-right mdi mdi-eye"></i>
+          </li>
+        </ol>
+        <div class='ajax_lista_descriptores_00000005'>
+          @include('catacion.ajax.adescriptorcatacion', ['tipocatacion_codigo' => '00000005'])
+        </div>
+      @endif
     </div>
 
 

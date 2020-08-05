@@ -2,7 +2,8 @@
       data_muestra_id = '{{$muestra->id}}'
       data_codigo = '00000012'>
       @php
-        $value = $funcion->catacion->value_catacion('00000012',$muestra->id)
+        $value = $funcion->catacion->value_catacion('00000012',$muestra->id);
+        $data_catacion = $funcion->catacion->data_catacion('00000012',$muestra->id);
       @endphp
   <div class="panel-heading panel-heading-contrast"><b>Defectos</b>
     <div class="tools">
@@ -13,36 +14,69 @@
   <div class="panel-body panel-indicadores">
 
     <div class='col-xs-12'>
-      <div class="form-group">
-        <label class="col-sm-3 control-label">Defecto :</label>
-        <div class="col-sm-6 input-group xs-mb-15">
-            <input  type="number"
-                    id="defecto"
-                    name='defecto'
-                    value="{{number_format($value, 0, '.', ',')*-1}}"
-                    required = ""
-                    autocomplete="off"
-                    maxlength="300"
-                    class="form-control input-sm"/>
 
-            <span class="input-group-btn">
-                  <button id="asignardefectos" type="button" class="btn btn-primary ">
-                    <font><i class="mdi mdi-refresh"></i></font>
-                  </button>
-            </span>
+      <div class='col-xs-6'>
+        <div class="form-group">
+          <label class="col-sm-12 control-label">Numero de tazas :</label>
+          <div class="col-sm-12">
+            {!! Form::select( 'numero_tazas', $combo_numerotazas, array($data_catacion->numerotasas),
+                              [
+                                'class'       => 'form-control control input-sm' ,
+                                'id'          => 'numero_tazas',
+                                'required'    => ''
+                              ]) !!}
+          </div>
         </div>
+      </div>
+
+      <div class='col-xs-6'>
+        <div class="form-group">
+          <label class="col-sm-12 control-label">Intensidad :</label>
+          <div class="col-sm-12">
+            {!! Form::select( 'intensidad', $combo_intensidad, array($data_catacion->intensidad),
+                              [
+                                'class'       => 'form-control control input-sm' ,
+                                'id'          => 'intensidad',
+                                'required'    => ''
+                              ]) !!}
+          </div>
+        </div>
+      </div>
+
+      <div class="dropdown-tools">
+          <div class="btn-group xs-mt-5 xs-mb-10">
+            <label data-toggle="modal" data-target="#mod-warning" type="button" class="btn btn-default txtnumerotasas">
+              {{$data_catacion->numerotasas}}
+            </label>
+            <label data-toggle="modal" data-target="#mod-warning" type="button" class="btn btn-default active">
+              X
+            </label>
+            <label data-toggle="modal" data-target="#mod-warning" type="button" class="btn btn-default txtintensidad">
+              {{$data_catacion->intensidad}}
+            </label>
+            <label data-toggle="modal" data-target="#mod-warning" type="button" class="btn btn-default active">
+              =
+            </label>
+            <label data-toggle="modal" data-target="#mod-warning" type="button" class="btn btn-default txtdefectos">
+              {{number_format($value, 2, '.', ',')}}
+            </label>
+
+          </div>
       </div>
     </div>
 
     <div class='col-xs-12'>
-      <ol class="breadcrumb">
-        <li class="active selectdescriptores">
-          Descriptores <i class="icon icon-right mdi mdi-eye"></i>
-        </li>
-      </ol>
-      <div class='ajax_lista_descriptores_00000012'>
-        @include('catacion.ajax.adescriptorcatacion', ['tipocatacion_codigo' => '00000012'])
-      </div>
+
+      @if(!isset($revisar))
+       <ol class="breadcrumb">
+          <li class="active selectdescriptores">
+            Descriptores <i class="icon icon-right mdi mdi-eye"></i>
+          </li>
+        </ol>
+        <div class='ajax_lista_descriptores_00000012'>
+          @include('catacion.ajax.adescriptorcatacion', ['tipocatacion_codigo' => '00000012'])
+        </div>
+      @endif
     </div>
 
 

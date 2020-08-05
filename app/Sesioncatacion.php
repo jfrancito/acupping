@@ -24,4 +24,8 @@ class Sesioncatacion extends Model {
 		return $this->hasMany('App\Sesionuser');
 	}
 
+	public function estado() {
+		return $this->belongsTo('App\Estado');
+	}
+
 }

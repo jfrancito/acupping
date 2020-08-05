@@ -2,6 +2,69 @@ $(document).ready(function(){
 
 	var carpeta = $("#carpeta").val();
 
+    $(".catacion").on('click','.editar-catacion', function() {
+        event.preventDefault();
+        $(".revisarcatacion").css( "display", "none");
+        $(".updatecatacion").css( "display", "block");
+    });
+
+    $(".catacion").on('click','.btn-resumen-session', function() {
+
+        var _token                            = $('#token').val();
+        var data_sessioncatacion_id           = $(this).attr('data_sessioncatacion_id');
+
+        $.ajax({
+            
+            type    :   "POST",
+            url     :   carpeta+"/ajax-modal-detalle-muestras",
+            data    :   {
+                            _token                  : _token,
+                            sessioncatacion_id      : data_sessioncatacion_id
+                        },    
+            success: function (data) {
+                $('.modal-detalle-muestras').html(data);
+                $('#detalle-muestras').niftyModal();
+            },
+            error: function (data) {
+                error500(data);
+            }
+        });
+    });
+
+
+    $(".catacion").on('click','.btn_bottom,.btn_up', function() {
+
+        var _token                      = $('#token').val();
+        var padre                       = $(this);
+        var data_muestra_descriptor     = $(padre).attr('data_muestra_descriptor');
+        var accion                      = $(padre).attr('accion');
+        var padre_seccion               = $(this).parents('.padre_seccion');
+        var data_muestra_id             = $(padre_seccion).attr('data_muestra_id');
+        $('.ajax_descriptores_muestra').html('');
+
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+"/ajax-subir-bajar-prioridades",
+            data    :   {
+                            _token                     : _token,
+                            muestra_descriptor_id      : data_muestra_descriptor,
+                            accion                     : accion,
+                            muestra_id                 : data_muestra_id,
+                        },
+            success: function (data) {
+                $('.ajax_descriptores_muestra').html(data);
+                cerrarcargando();
+            },
+            error: function (data) {
+                error500(data);
+            }
+        });
+    });
+
+
+
+
     $(".catacion").on('change','#especie_id', function() {
         var _token                      = $('#token').val();
         var especie_id                  = $(this).val();
@@ -50,6 +113,7 @@ $(document).ready(function(){
 
                 $('.ajax_lista_descriptores_'+tipocatacion_codigo).html(data);
                 alertajax("Eliminación exitosa");
+                actualizar_descriptores_muestra(data_muestra_id);
                 cerrarcargando();
 
             },
@@ -78,6 +142,9 @@ $(document).ready(function(){
         var descriptortipocatacion_id   = $(padre).attr('data_descriptortipocatacion_id');
         var data_catacion_id            = $(padre).attr('data_catacion_id');
         var tipocatacion_codigo         = $(padre).attr('data_tipocatacion_codigo');
+        var padre_seccion               = $(this).parents('.padre_seccion');
+        var data_muestra_id             = $(padre_seccion).attr('data_muestra_id');
+
 
         $('.ajax_lista_descriptores_'+tipocatacion_codigo).html('');
         abrircargando();
@@ -89,9 +156,11 @@ $(document).ready(function(){
                             descriptortipocatacion_id       : descriptortipocatacion_id,
                             data_catacion_id                : data_catacion_id,
                             tipocatacion_codigo             : tipocatacion_codigo,
+                            muestra_id                      : data_muestra_id,
                         },
             success: function (data) {
                 $('.ajax_lista_descriptores_'+tipocatacion_codigo).html(data);
+                actualizar_descriptores_muestra(data_muestra_id);
                 alertajax("Inserción exitosa");
                 cerrarcargando();
             },
@@ -148,17 +217,28 @@ $(document).ready(function(){
 
 
 
-    $(".catacion").on('click','#asignardefectos', function() {
+    $(".catacion").on('change','#numero_tazas,#intensidad', function() {
 
         var padre                       = $(this).parents('.padre_seccion');
         var puntaje                     = $(padre).find('.puntaje');
         var data_muestra_id             = $(padre).attr('data_muestra_id');
         var data_codigo                 = $(padre).attr('data_codigo');
-        var value                       = $(padre).find('#defecto').val();
+        var intensidad                  = parseFloat($("#intensidad").val());
+        var numero_tazas                = parseFloat($("#numero_tazas").val());
+        var value                       = intensidad*numero_tazas;
         var data_value                  = -parseFloat(value);
+
+
         $(puntaje).text(data_value.toFixed(2));
-        actualizar_puntaje_catacion_muestra(data_muestra_id,data_codigo,data_value);
+        $(".txtintensidad").html(intensidad.toFixed(2));
+        $(".txtnumerotasas").html(numero_tazas.toFixed(2));
+        $(".txtdefectos").html(data_value.toFixed(2));
+
+        actualizar_puntaje_catacion_muestra_defecto(data_muestra_id,data_codigo,data_value,intensidad,numero_tazas);
+
     });
+
+
 
     $(".catacion").on('click','.checkuniformidad', function() {
 
@@ -239,6 +319,33 @@ $(document).ready(function(){
         });
     });
 
+    $(".catacion").on('click','.tabcatacionrevisar', function() {
+        var _token                      = $('#token').val();
+        var data_alias                  = $(this).attr('data_alias');
+        var contenedor                  = 'cont'+data_alias;
+        var idopcion                    = $(this).attr('data_opcion');
+        var muestra_id                  = $(this).attr('data_muestra');
+        $('.tab-pane').html('');
+        abrircargando();
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+"/ajax-mostrar-form-catacion-revisar",
+            data    :   {
+                            _token                  : _token,
+                            muestra_id              : muestra_id,
+                            idopcion                : idopcion
+                        },
+            success: function (data) {
+                $('.'+contenedor).html(data);
+                cerrarcargando();
+            },
+            error: function (data) {
+                error500(data);
+            }
+        });
+    });
+
+
 
 
 
@@ -301,6 +408,28 @@ $(document).ready(function(){
     actualizar_indicadores_muestra();
     
 
+    function actualizar_descriptores_muestra(muestra_id){
+
+        var _token = $('#token').val();
+        $('.ajax_descriptores_muestra').html('');
+
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+"/ajax-actualizar-descriptores-muestras",
+            data    :   {
+                            _token                  : _token,
+                            muestra_id              : muestra_id
+                        },
+            success: function (data) {
+                $('.ajax_descriptores_muestra').html(data);
+            },
+            error: function (data) {
+                error500(data);
+            }
+        });
+
+    }
+
     function actualizar_puntaje_catacion_muestra(muestra_id,tipocatacion_codigo,catacion_value){
 
         var _token = $('#token').val();
@@ -324,6 +453,34 @@ $(document).ready(function(){
         });
 
     }
+
+    function actualizar_puntaje_catacion_muestra_defecto(muestra_id,tipocatacion_codigo,catacion_value,intensidad,numero_tazas){
+
+        var _token = $('#token').val();
+
+        $.ajax({
+            type    :   "POST",
+            url     :   carpeta+"/ajax-recalcular-puntaje-catacion-muestra-defecto",
+            data    :   {
+                            _token                  : _token,
+                            muestra_id              : muestra_id,
+                            catacion_value          : catacion_value,
+                            tipocatacion_codigo     : tipocatacion_codigo,
+                            intensidad              : intensidad,
+                            numero_tazas            : numero_tazas,
+                        },
+            success: function (data) {
+                $("#puntaje_total").html(data);
+                alertajax("Modificación exitosa");
+            },
+            error: function (data) {
+                error500(data);
+            }
+        });
+
+    }
+
+
     function actualizar_notas_catacion_muestra(muestra_id,tipocatacion_codigo,catacion_value){
 
         var _token = $('#token').val();

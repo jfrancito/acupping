@@ -14,6 +14,7 @@
       <div class="slider00000004 slidercatacion"></div>
     </div>
     <div class='col-xs-9'>
+      @if(!isset($revisar))
       <ol class="breadcrumb">
         <li class="active selectdescriptores">
           Descriptores <i class="icon icon-right mdi mdi-eye"></i>
@@ -22,9 +23,8 @@
       <div class='ajax_lista_descriptores_00000004'>
         @include('catacion.ajax.adescriptorcatacion', ['tipocatacion_codigo' => '00000004'])
       </div>
+      @endif
     </div>
-
-
   </div>
 
 

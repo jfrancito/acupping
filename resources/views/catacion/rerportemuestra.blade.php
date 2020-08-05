@@ -5,8 +5,8 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/select2/css/select2.min.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/bootstrap-slider/css/bootstrap-slider.css') }} "/>
     <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/slider-barras/css/slider.css') }} "/>
+    <link rel="stylesheet" type="text/css" href="{{ asset('public/lib/chart/css/chart.css') }} "/>
 
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.4/themes/flick/jquery-ui.css">
 @stop
 @section('section')
 
@@ -17,49 +17,61 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider" >SESION DE CATACION #{{$sessioncatacion->codigo}}
-              <span class="panel-subtitle">Incio : {{date_format(date_create(date($sessioncatacion->fecha)), 'd-m-Y H:i:s')}}</span>
-
-              <div  class="tools btn-resumen-session"
-                    data_sessioncatacion_id="{{$sessioncatacion->id}}">
-                <span class="icon mdi mdi-save"> <br><strong>Guardar</strong></span>
-              </div>
-
+          <div class="panel-heading panel-heading-divider" >Muestra #{{$muestra->alias}} - {{$muestra->codigo}}
           </div>
 
-
           <div class="panel-body">
-
             <div class="panel panel-default">
-              <div class="tab-container">
-                <ul class="nav nav-tabs">
-                  @foreach($listamuestas as $index=>$item)
-                    <li class="@if($item->id == $muestra->id) active @endif tabcatacion"
-                        data_alias='{{$item->alias}}'
-                        data_opcion='{{$idopcion}}'
-                        data_muestra='{{$item->id}}'>
-                      <a href="#{{$item->alias}}" data-toggle="tab">
-                        {{$item->alias}}<br>
-                        <strong>{{$item->codigo}}</strong>
-                      </a>
-                    </li>
-                  @endforeach
 
-                </ul>
-                <div class="tab-content">
+		      <div class="col-md-6">
+					<div style="margin-left:80px;" id="chart"></div>
+		      </div>
+		      <div class="col-md-6">
+					<table class="table tabla-reporte" style="font-size: 1em;">
+						<tbody>
+								<tr>
+									<td class='center sin-border-top'><i class = "zmdi zmdi-accounts zmdi-hc-2x"> </i></td>
+									<td class='center sin-border-top'><b>Número de catadores</b></td>
+									<td class='center sin-border-top'><span class="label label-success">1</span></td>
+								</tr>
+								<tr>
+									<td class='center'><i class = "zmdi zmdi-chart zmdi-hc-2x"> </i></td>
+									<td class='center'><b>Calificación promedio</b></td>
+									<td class='center'><span class="label label-success">{{$muestra->puntaje}}</span></td>
+								</tr>
+								<tr>
+									<td class='center'><i class = "zmdi zmdi-group zmdi-hc-2x"> </i></td>
+									<td class='center'><b>Rango de calificación</b></td>
+									<td class='center'><span class="label label-success">{{$muestra->puntaje}} - {{$muestra->puntaje}}</span></td>
+								</tr>
 
-                  @foreach($listamuestas as $index=>$item)
-                  <div id="{{$item->alias}}" class="tab-pane @if($item->id == $muestra->id) active @endif cont cont{{$item->alias}}">
-                    @if($item->id == $muestra->id)
-                        @include('catacion.form.formcatacion')
-                    @endif
-                  </div>
-                  @endforeach
-                </div>
-              </div>
+								@foreach($listatipocatacion as $itemtc)
+								<tr>
+								    @php
+								        $data_catacion = $funcion->catacion->data_catacion($itemtc->codigo,$muestra->id);
+								        $icono = $funcion->catacion->icono_por_codigo($itemtc->codigo);
+								    @endphp
+
+									<td class='center'><i class = "zmdi {{$icono}} zmdi-hc-2x"> </i></td>
+									<td class='center'><b>{{$itemtc->nombre}}</b></td>
+						   			<td class='center'>
+						   				@if($itemtc->codigo == '00000001')
+											<span class="icon mdi mdi-circle tueste-circle tueste-c-n{{(int)$data_catacion->value}}"></span>
+										@else
+						   					@if($itemtc->codigo == '00000012')
+												<span class="label label-danger">{{$data_catacion->value}}</span>
+											@else
+												<span class="label label-success">{{$data_catacion->value}}</span>
+											@endif
+										@endif
+						   			</td>
+								</tr>
+								@endforeach
+						</tbody>
+					</table>
+		      </div>
+
             </div>
-
-
           </div>
         </div>
       </div>
@@ -89,10 +101,10 @@
   <script src="{{ asset('public/js/app-form-elements.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/parsley/parsley.js') }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/slider-barras/js/slider.js') }}" type="text/javascript"></script>
-
   <script src="{{ asset('public/js/general/navAccordion.js?v='.$version) }}" type="text/javascript"></script>
   <script src="{{ asset('public/lib/jquery.niftymodals/dist/jquery.niftymodals.js') }}" type="text/javascript"></script>
-
+  <script src="{{ asset('public/lib/chart/js/chart.js') }}" type="text/javascript"></script>
+  <script src="{{ asset('public/lib/chart/js/main.js?v='.$version) }}" type="text/javascript"></script>
 
   <script type="text/javascript">
 

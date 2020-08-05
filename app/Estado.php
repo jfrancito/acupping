@@ -16,4 +16,8 @@ class Estado extends Model {
 		return $this->hasMany('App\Muestra');
 	}
 
+	public function sesioncataciones() {
+		return $this->hasMany('App\Sesioncatacion');
+	}
+
 }

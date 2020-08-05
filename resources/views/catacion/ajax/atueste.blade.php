@@ -1,4 +1,4 @@
-<div class="panel panel-border panel-contrast">
+<div class="panel panel-border panel-contrast padre_seccion_tueste">
   <div class="panel-heading panel-heading-contrast"><b>Nivel de tueste</b></div>
   <div class="panel-body">
     <div class="xs-mt-20 xs-mb-10">

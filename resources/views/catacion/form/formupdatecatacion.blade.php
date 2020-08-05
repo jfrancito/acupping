@@ -1,3 +1,29 @@
+
+  <div class="panel panel-default panel-table informacion_muestra">
+    <div class="panel-heading">
+
+      <div class="title">
+      <p><b>Productor : </b>{{$muestra->productor}}</p>
+      <p><b>Tipo de muestra : </b> {{$muestra->tipomuestra->nombre}}</p>
+      <p><b>Descripción del producto  : </b>{{$muestra->producto->nombre}}</p>
+      </div>
+        <div class="tools tooltiptop">
+          <a href="#" class="tooltipcss opciones editar-catacion">
+            <span class="tooltiptext">Editar Resultado</span>
+            <span class="icon mdi mdi-comment-edit"></span>
+          </a>
+
+          <a href="{{ url('/agregar-sesion-catacion/'.$idopcion) }}" class="tooltipcss opciones">
+            <span class="tooltiptext">Ver reporte</span>
+            <span class="icon mdi mdi-chart"></span>
+          </a>
+
+        </div>
+      </div>
+  </div>
+
+
+
   <input type="hidden" name="puntaje_fragancia" id="puntaje_fragancia" value="{{$funcion->catacion->value_catacion('00000002',$muestra->id)}}">
   <input type="hidden" name="puntaje_sabor" id="puntaje_sabor" value="{{$funcion->catacion->value_catacion('00000003',$muestra->id)}}">
   <input type="hidden" name="puntaje_saborboca" id="puntaje_saborboca" value="{{$funcion->catacion->value_catacion('00000004',$muestra->id)}}">
@@ -85,11 +111,18 @@
       @include('catacion.ajax.anotas')
     </div>
   </div>
+
+  @if(!isset($revisar))
+
   <div class="col-md-4">
     <div class='container-prioridad'>
         @include('catacion.ajax.aprioridad')
     </div>
   </div>
+
+  @endif
+
+
 
 @if(isset($ajax))
   <script type="text/javascript">

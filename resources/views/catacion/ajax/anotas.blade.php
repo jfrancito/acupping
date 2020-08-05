@@ -11,7 +11,7 @@
       <div class="form-group">
           <div class="col-xs-12 input-group xs-mb-15">
 
-           <textarea id="notas" class="form-control input-sm" rows="4">{{$funcion->catacion->nota_catacion('00000013',$muestra->id)}}</textarea>
+           <textarea id="notas" class="form-control input-sm" rows="7">{{$funcion->catacion->nota_catacion('00000013',$muestra->id)}}</textarea>
 
             <span class="input-group-btn">
                   <button id="asignarnota" type="button" class="btn btn-primary ">
