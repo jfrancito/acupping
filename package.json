@@ -27,6 +27,6 @@
     "vuejs-datatable": "^1.7.0",
     "vuejs-datepicker": "^1.6.2",
     "vuetify": "^2.0.11",
-    "xlsx": "^0.15.1"
+    "xlsx": "^0.17.0"
   }
 }
